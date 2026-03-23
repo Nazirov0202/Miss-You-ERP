@@ -56,8 +56,15 @@ def _create_tables_directly():
 
 
 async def main():
-    # Migratsiyani ishga tushirish
-    run_migrations()
+    # Jadvallarni yaratish
+    from sqlalchemy import create_engine
+    from app.models import Base
+    sync_url = settings.database_url_sync
+    logger.info("Jadvallar yaratilmoqda: %s", sync_url.split("@")[-1] if "@" in sync_url else "local")
+    engine = create_engine(sync_url)
+    Base.metadata.create_all(engine)
+    engine.dispose()
+    logger.info("Jadvallar tayyor!")
 
     # Redis storage (FSM uchun)
     redis = Redis.from_url(settings.redis_url)
